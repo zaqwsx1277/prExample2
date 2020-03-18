@@ -1,0 +1,77 @@
+#include "TLogModel.h"
+
+//-------------------------------------------------------------------
+TLogModel::TLogModel(QObject *parent)
+{
+
+}
+//-------------------------------------------------------------------
+int TLogModel::rowCount(const QModelIndex &parent) const
+{
+    return this -> size() ;
+}
+//-------------------------------------------------------------------
+int TLogModel::columnCount(const QModelIndex &parent) const
+{
+    return columnNumber::cnCount ;
+}
+//-------------------------------------------------------------------
+QVariant TLogModel::data(const QModelIndex &index, int role) const
+{
+    QVariant retVal = QVariant () ;
+    if (index.isValid()) {
+
+        switch (role) {             // т.к. role могут быть сымые разные, то использую switch
+          case Qt::DisplayRole : {
+            auto logData = this -> at(index.row()) ;    // Получаем запись из контейнере
+                switch (index.column()) {               // Получаем значение для нужной колонки
+
+                  case cnValue :
+                    retVal = QString (logData.value) ;
+                  break ;
+
+                  case cnResult :
+                    if (logData.isShow) retVal = QString (2 * logData.value) ;
+                      else retVal = QString ("") ;
+                  break ;
+
+                  default :
+                  break ;
+              }
+          }
+          break ;
+
+          default :         // Обработка других ролей
+          break ;
+        }
+    }
+    return retVal ;
+}
+//---------------------------------------------------------------------------------
+QVariant TLogModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    QVariant retVal = QVariant () ;
+    if (role != Qt::DisplayRole) return QVariant();
+
+    if (orientation == Qt::Horizontal)
+            switch (section) {
+              case cnValue :
+                retVal = "Начальное значение";
+              break ;
+
+              case cnResult :
+                retVal = "Результат" ;
+              break ;
+
+              default :
+              break ;
+            }
+    return retVal ;
+}
+//----------------------------------------------------
+void TLogModel::refreshView ()
+{
+    beginResetModel();
+    endResetModel();
+}
+//----------------------------------------------------
